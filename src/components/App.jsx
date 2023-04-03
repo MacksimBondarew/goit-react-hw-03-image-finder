@@ -1,16 +1,22 @@
-export const App = () => {
-  return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
-      }}
-    >
-      React homework template
-    </div>
-  );
-};
+import { Component } from 'react';
+import SearchBar from './SearchBar';
+
+class App extends Component {
+    state = {
+        query: '',
+    };
+
+    queryImages = query => {
+        this.setState({ query });
+    };
+
+    render() {
+        return (
+            <>
+                <SearchBar onSubmit={this.queryImages} />
+            </>
+        );
+    }
+}
+
+export default App;
