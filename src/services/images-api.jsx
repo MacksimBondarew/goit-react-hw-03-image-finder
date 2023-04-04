@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-export default async function fetchImages(name, page) {
+async function fetchImages(query, page) {
     try {
         const response = await axios.get('https://pixabay.com/api/', {
             params: {
-                q: name,
+                q: query,
                 page: page,
                 key: '33933963-4f485d9798c483eb0ad8732f3',
                 image_type: 'photo',
@@ -14,8 +14,7 @@ export default async function fetchImages(name, page) {
         });
         return response.data;
     } catch (error) {
-        // console.error(error);
-        // throw error;
         console.log("ти отримав помилку");
     }
 }
+export { fetchImages };
