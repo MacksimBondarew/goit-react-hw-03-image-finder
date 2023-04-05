@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import SearchBar from './SearchBar';
 import { fetchImages } from 'services/images-api';
-import ImageGallery from './ImageGallery'
+import ImageGallery from './ImageGallery';
 class App extends Component {
     state = {
         request: '',
@@ -12,56 +12,52 @@ class App extends Component {
     };
 
     queryImages = async request => {
-        const {page} = this.state;
-        const { hits, totalHits } = await fetchImages( request, page);
-
-        if (request.trim() === '') {
-            alert('Please enter a')
-        }
+        const { page } = this.state;
+        const { hits, totalHits } = await fetchImages(request, page);
+        console.log(hits);
         try {
-            if (hits.length < 1) {
-                this.setState({status: 'error'});
-            }
-            else {
+            if (hits.length < 1 || request.trim() === '') {
+                this.setState({ status: 'error' });
+            } else {
                 this.setState({
-                    request, 
-                    status: "ok",
+                    request,
+                    status: 'ok',
                     images: hits,
                     total: totalHits,
                     page: 1,
                 });
             }
         } catch (error) {
-            this.setState({ status: "error" });
+            this.setState({ status: 'error' });
         }
     };
-    
 
     render() {
         const { status, images } = this.state;
-        if (status === "idle") {
+        if (status === 'idle') {
             return (
                 <>
                     <SearchBar onSubmit={this.queryImages} />
                     <h1>rwqrrqreq</h1>
                 </>
-            )
+            );
         }
-        if (status === "ok") {
-            <>
-                <SearchBar onSubmit={this.queryImages} />
-                <ImageGallery images={images} />
-            </>
-        }
-        if (status === "error") {
+        if (status === 'ok') {
             return (
                 <>
                     <SearchBar onSubmit={this.queryImages} />
-                    <h1>ewfewfew</h1>
+                    <ImageGallery images={images} />
                 </>
-            )
+            );
         }
-
+        if (status === 'error') {
+            return (
+                <>
+                    <SearchBar onSubmit={this.queryImages} />
+                    <h1>console.error();</h1>
+                </>
+            );
+        }
     }
 }
 

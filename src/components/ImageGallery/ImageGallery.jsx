@@ -1,15 +1,15 @@
 import ImageGalleryItem from '../ImageGalleryItem';
+import { ImageContainer, ImageGalleryContainer} from './ImageGallery.styled';
 
 const ImageGallery = ({ images }) => {
-    console.log(images);
     return (
-        <ul class="gallery">
-            {images.map(({ id, pageURL, tags }) => (
-                <li key={id}>
-                    <ImageGalleryItem url={pageURL} alt={tags} />
-                </li>
+        <ImageGalleryContainer>
+            {images.map(({ id, webformatURL, tags }) => (
+                <ImageContainer key={id}>
+                    <ImageGalleryItem url={webformatURL} alt={tags} />
+                </ImageContainer>
             ))}
-        </ul>
+        </ImageGalleryContainer>
     );
 };
 export default ImageGallery;

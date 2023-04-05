@@ -1,5 +1,7 @@
+import { Image } from './ImageGalleryItem.styled';
+
 const ImageGalleryItem = ({url, alt}) => {
-    return <img src={url} alt={alt} />;
+    return <Image src={url} alt={alt} />;
 };
 
 export default ImageGalleryItem;
