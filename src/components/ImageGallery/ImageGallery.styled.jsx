@@ -9,7 +9,7 @@ padding: 0;
 `;
 
 const ImageContainer = styled.li`
-flex-basis: calc(100% / 6);
+flex-basis: calc(100% / 4);
 margin-bottom: 20px;
 padding: 10px;
 box-sizing: border-box;
