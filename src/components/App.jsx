@@ -4,9 +4,10 @@ import { fetchImages } from 'services/images-api';
 import ImageGallery from './ImageGallery';
 import Button from './Button';
 import Loader from './Loader/Loader';
+import { Information, Error } from './App.styled';
 class App extends Component {
     state = {
-        request: '',
+        query: '',
         status: 'idle',
         page: 1,
         images: [],
@@ -15,17 +16,18 @@ class App extends Component {
 
     queryImages = async request => {
         this.setState({ page: 1, status: 'pending' });
-        const { page } = this.state;
-        const { hits } = await fetchImages(request, page);
+        const { page, query } = this.state;
         try {
-            if (hits.length < 1 || request.trim() === '') {
+            const { hits, totalHits } = await fetchImages(request, page);
+            if (hits.length < 1 || request.trim() === '' || query === request) {
                 this.setState({ status: 'error' });
             } else {
                 this.setState({
-                    request,
+                    query: request,
                     status: 'ok',
                     images: hits,
                     page: page,
+                    total: totalHits,
                 });
             }
         } catch (error) {
@@ -33,17 +35,13 @@ class App extends Component {
         }
     };
     addOnePoingPage = async () => {
-        const { page, request } = this.state;
+        const { page, query } = this.state;
         this.setState({
             status: 'pending',
         });
-        const button = document.querySelector('#addOnePage');
-        let totalPage = page + 1;
-        const { hits, totalHits } = await fetchImages(request, totalPage);
-        const totalPages = Math.ceil(totalHits / 12);
-        if (page > totalPages) {
-            button.style.display = 'none';
-        } else {
+        try {
+            let totalPage = page + 1;
+            const { hits } = await fetchImages(query, totalPage);
             this.setState({
                 status: 'ok',
                 page: totalPage,
@@ -51,32 +49,42 @@ class App extends Component {
             this.setState(({ images }) => ({
                 images: [...images, ...hits],
             }));
+        } catch {
+            this.setState({ status: 'error' });
         }
     };
 
     render() {
-        const { status, images } = this.state;
+        const { status, images, total, page } = this.state;
+        const totalPages = Math.ceil(total / 12);
         if (status === 'idle') {
             return (
                 <>
                     <SearchBar onSubmit={this.queryImages} />
-                    <h1>rwqrrqreq</h1>
+                    <Information>
+                        Please enter something in the search and click on the
+                        button
+                    </Information>
                 </>
             );
         }
         if (status === 'pending') {
             return (
-            <>
-            <SearchBar onSubmit={this.queryImages} />
-            <Loader />;
-            </>)
+                <>
+                    <SearchBar onSubmit={this.queryImages} />
+                    <ImageGallery images={images} modalOpen={this.modalOpen} />
+                    <Loader />;
+                </>
+            );
         }
         if (status === 'ok') {
             return (
                 <>
                     <SearchBar onSubmit={this.queryImages} />
-                    <ImageGallery images={images} />
-                    <Button addOnePoingPage={this.addOnePoingPage} />
+                    <ImageGallery images={images} modalOpen={this.modalOpen} />
+                    {totalPages > page && (
+                        <Button addOnePoingPage={this.addOnePoingPage} />
+                    )}
                 </>
             );
         }
@@ -84,7 +92,10 @@ class App extends Component {
             return (
                 <>
                     <SearchBar onSubmit={this.queryImages} />
-                    <h1>console.error();</h1>
+                    <Error>
+                        Sorry, an error occurred while loading this page. Please
+                        try again later
+                    </Error>
                 </>
             );
         }
