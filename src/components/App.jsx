@@ -15,9 +15,9 @@ class App extends Component {
     };
 
     queryImages = async request => {
-        this.setState({ page: 1, status: 'pending' });
-        const { page, query } = this.state;
         try {
+            this.setState({ page: 1, status: 'pending' }, async () => {
+                const { page, query } = this.state;
             const { hits, totalHits } = await fetchImages(request, page);
             if (hits.length < 1 || request.trim() === '' || query === request) {
                 this.setState({ status: 'error' });
@@ -30,29 +30,35 @@ class App extends Component {
                     total: totalHits,
                 });
             }
+            });
         } catch (error) {
             this.setState({ status: 'error' });
         }
     };
+    
     addOnePoingPage = async () => {
-        const { page, query } = this.state;
-        this.setState({
-            status: 'pending',
-        });
         try {
-            let totalPage = page + 1;
-            const { hits } = await fetchImages(query, totalPage);
-            this.setState({
-                status: 'ok',
-                page: totalPage,
+            this.setState(prevState => ({
+                page: prevState.page + 1
+            }), async () => {
+                const { page, query } = this.state;
+                this.setState({
+                    status: 'pending',
+                });
+                const { hits } = await fetchImages(query, page);
+                this.setState({
+                    status: 'ok',
+                    page: page,
+                });
+                this.setState(({ images }) => ({
+                    images: [...images, ...hits],
+                }));
             });
-            this.setState(({ images }) => ({
-                images: [...images, ...hits],
-            }));
         } catch {
             this.setState({ status: 'error' });
         }
     };
+    
 
     render() {
         const { status, images, total, page } = this.state;
