@@ -23,8 +23,6 @@ class App extends Component {
 
                 
                 if (hits.length < 1 || query.trim() === '') {
-                    console.log(query)
-                    console.log(prevState.query)
                     this.setState({ status: 'error' });
                 } else {
                     const newImages =
