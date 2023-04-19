@@ -14,39 +14,40 @@ class App extends Component {
         total: 0,
     };
 
-    queryImages = async request => {
-        try {
-            this.setState({ page: 1, status: 'pending' });
-            const { hits, totalHits } = await fetchImages(request, 1);
-            if (hits.length < 1 || request.trim() === '') {
+    async componentDidUpdate(prevProps, prevState) {
+        const { query, page } = this.state;
+
+        if (query !== prevState.query || page !== prevState.page) {
+            try {
+                const { hits, totalHits } = await fetchImages(query, page);
+
+                
+                if (hits.length < 1 || query.trim() === '') {
+                    console.log(query)
+                    console.log(prevState.query)
+                    this.setState({ status: 'error' });
+                } else {
+                    const newImages =
+                        page === 1 ? hits : [...this.state.images, ...hits];
+                    this.setState({
+                        status: 'ok',
+                        images: newImages,
+                        total: totalHits,
+                    });
+                }
+            } catch (error) {
                 this.setState({ status: 'error' });
-            } else {
-                this.setState({
-                    query: request,
-                    status: 'ok',
-                    images: hits,
-                    total: totalHits,
-                });
             }
-        } catch (error) {
-            this.setState({ status: 'error' });
         }
+    }
+
+    queryImages = request => {
+        this.setState({ query: request, page: 1, status: 'pending' });
     };
-    
+
     addOnePoingPage = async () => {
-        try {
-            const { page, query } = this.state;
-            const { hits } = await fetchImages(query, page + 1);
-            this.setState({
-                status: 'ok',
-                page: page + 1,
-                images: [...this.state.images, ...hits],
-            });
-        } catch {
-            this.setState({ status: 'error' });
-        }
+        this.setState(prevState => ({ page: prevState.page + 1 }));
     };
-    
 
     render() {
         const { status, images, total, page } = this.state;
